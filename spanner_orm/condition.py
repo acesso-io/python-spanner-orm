@@ -171,7 +171,11 @@ class ColumnsEqualCondition(Condition):
 class ForceIndexCondition(Condition):
     """Used to indicate which index should be used in a Spanner query."""
 
-    def __init__(self, index_or_name: Union[Type[index.Index], str]):
+    def __init__(
+        self,
+        index_or_name: Union[Type[index.Index], str],
+        emulator_disable_null_filtered_check: str = False,
+    ):
         super().__init__()
         if isinstance(index_or_name, index.Index):
             self.name = index_or_name.name
@@ -179,6 +183,7 @@ class ForceIndexCondition(Condition):
         else:
             self.name = index_or_name
             self.index = None
+        self.emulator_check = emulator_disable_null_filtered_check
 
     def _params(self) -> Dict[str, Any]:
         return {}
@@ -187,7 +192,12 @@ class ForceIndexCondition(Condition):
         return Segment.FROM
 
     def _sql(self) -> str:
-        return "@{{FORCE_INDEX={}}}".format(self.name)
+        table_hints = ["FORCE_INDEX={}".format(self.name)]
+        if self.emulator_check:
+            table_hints.append(
+                "spanner_emulator.disable_query_null_filtered_index_check=true"
+            )
+        return "@{{{}}}".format(",".join(table_hints))
 
     def _types(self) -> Dict[str, type_pb2.Type]:
         return {}
@@ -683,7 +693,10 @@ def equal_to(column: Union[field.Field, str], value: Any) -> EqualityCondition:
     return EqualityCondition(column, value)
 
 
-def force_index(forced_index: Union[index.Index, str]) -> ForceIndexCondition:
+def force_index(
+    forced_index: Union[index.Index, str],
+    emulator_disable_null_filtered_check: bool = False,
+) -> ForceIndexCondition:
     """Condition to force the query to use the given index.
 
     Args:
@@ -693,7 +706,7 @@ def force_index(forced_index: Union[index.Index, str]) -> ForceIndexCondition:
     Returns:
       A Condition subclass that will be used in the query
     """
-    return ForceIndexCondition(forced_index)
+    return ForceIndexCondition(forced_index, emulator_disable_null_filtered_check)
 
 
 def greater_than(column: Union[field.Field, str], value: Any) -> ComparisonCondition:
