@@ -24,7 +24,7 @@ setup(
     url="https://github.com/maroux/python-spanner-orm",
     packages=["spanner_orm", "spanner_orm.admin"],
     include_package_data=True,
-    python_requires="~=3.11",
+    python_requires="~=3.10",
     install_requires=["wheel", "google-cloud-spanner >= 1.6, <2.0.0dev"],
     tests_require=["absl-py"],
     extras_require={
