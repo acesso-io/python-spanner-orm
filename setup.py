@@ -25,10 +25,10 @@ setup(
     packages=["spanner_orm", "spanner_orm.admin"],
     include_package_data=True,
     python_requires="~=3.7",
-    install_requires=["wheel", "google-cloud-spanner >= 1.6, <2.0.0dev"],
+    install_requires=["wheel", "google-cloud-spanner>=3.44.0,<4.0.0"],
     tests_require=["absl-py"],
     extras_require={
-        "tests": ["black==20.8b1"],
+        "tests": ["black==23.3.0"],
     },
     entry_points={"console_scripts": ["spanner-orm = spanner_orm.admin.scripts:main"]},
 )
