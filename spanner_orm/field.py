@@ -20,8 +20,7 @@ from typing import Any, Type, Optional
 
 from spanner_orm import error
 
-from google.cloud.spanner_v1 import COMMIT_TIMESTAMP
-from google.cloud.spanner_v1.proto import type_pb2
+from google.cloud.spanner_v1 import COMMIT_TIMESTAMP, Type as SpannerType, TypeCode
 
 
 class FieldType(abc.ABC):
@@ -34,7 +33,7 @@ class FieldType(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def grpc_type() -> type_pb2.Type:
+    def grpc_type() -> SpannerType:
         raise NotImplementedError
 
     @staticmethod
@@ -126,8 +125,8 @@ class Boolean(FieldType):
         return "BOOL"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.BOOL)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.BOOL)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -143,8 +142,8 @@ class Integer(FieldType):
         return "INT64"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.INT64)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.INT64)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -160,8 +159,8 @@ class Float(FieldType):
         return "FLOAT64"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.FLOAT64)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.FLOAT64)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -177,8 +176,8 @@ class String(FieldType):
         return "STRING({size})".format(size=size)
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.STRING)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.STRING)
 
     @staticmethod
     def validate_type(value) -> None:
@@ -194,8 +193,8 @@ class Bytes(FieldType):
         return "BYTES({size})".format(size=size)
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.BYTES)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.BYTES)
 
     @staticmethod
     def validate_type(value) -> None:
@@ -211,8 +210,8 @@ class Bytes(FieldType):
         return "BYTES({size})".format(size=size)
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.BYTES)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.BYTES)
 
     @staticmethod
     def validate_type(value) -> None:
@@ -228,8 +227,8 @@ class Date(FieldType):
         return "DATE"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.DATE)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.DATE)
 
     @staticmethod
     def validate_type(value) -> None:
@@ -249,8 +248,8 @@ class StringArray(FieldType):
         return "ARRAY<STRING({size})>".format(size=size)
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.ARRAY)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.ARRAY)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -269,8 +268,8 @@ class BoolArray(FieldType):
         return "ARRAY<BOOL>"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.ARRAY)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.ARRAY)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -289,8 +288,8 @@ class IntegerArray(FieldType):
         return "ARRAY<INT64>"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.ARRAY)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.ARRAY)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -309,8 +308,8 @@ class FloatArray(FieldType):
         return "ARRAY<FLOAT64>"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.ARRAY)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.ARRAY)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -329,8 +328,8 @@ class DateArray(FieldType):
         return "ARRAY<DATE>"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.ARRAY)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.ARRAY)
 
     @staticmethod
     def validate_type(value: Any) -> None:
@@ -353,8 +352,8 @@ class Timestamp(FieldType):
         return "TIMESTAMP"
 
     @staticmethod
-    def grpc_type() -> type_pb2.Type:
-        return type_pb2.Type(code=type_pb2.TIMESTAMP)
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.TIMESTAMP)
 
     @staticmethod
     def validate_type(value: Any) -> None:

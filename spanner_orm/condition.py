@@ -23,7 +23,7 @@ from spanner_orm import field
 from spanner_orm import index
 from spanner_orm import relationship
 
-from google.cloud.spanner_v1.proto import type_pb2
+from google.cloud.spanner_v1 import Type as SpannerType, TypeCode
 
 
 class Segment(enum.Enum):
@@ -97,7 +97,7 @@ class Condition(abc.ABC):
     def _sql(self) -> str:
         pass
 
-    def types(self) -> Dict[str, type_pb2.Type]:
+    def types(self) -> Dict[str, SpannerType]:
         """Returns parameter types to be used in the SQL query.
 
         Returns:
@@ -109,7 +109,7 @@ class Condition(abc.ABC):
         return self._types()
 
     @abc.abstractmethod
-    def _types(self) -> Dict[str, type_pb2.Type]:
+    def _types(self) -> Dict[str, SpannerType]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -145,7 +145,7 @@ class ColumnsEqualCondition(Condition):
             other_column=self.destination_column,
         )
 
-    def _types(self) -> Dict[str, type_pb2.Type]:
+    def _types(self) -> Dict[str, SpannerType]:
         return {}
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -199,7 +199,7 @@ class ForceIndexCondition(Condition):
             )
         return "@{{{}}}".format(",".join(table_hints))
 
-    def _types(self) -> Dict[str, type_pb2.Type]:
+    def _types(self) -> Dict[str, SpannerType]:
         return {}
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -285,7 +285,7 @@ class IncludesCondition(Condition):
     def _sql(self) -> str:
         return ""
 
-    def _types(self) -> Dict[str, type_pb2.Type]:
+    def _types(self) -> Dict[str, SpannerType]:
         return {}
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -341,10 +341,10 @@ class LimitCondition(Condition):
             )
         return "LIMIT @{limit_key}".format(limit_key=self._limit_key)
 
-    def _types(self) -> Dict[str, type_pb2.Type]:
-        types = {self._limit_key: type_pb2.Type(code=type_pb2.INT64)}
+    def _types(self) -> Dict[str, SpannerType]:
+        types = {self._limit_key: SpannerType(code=TypeCode.INT64)}
         if self.offset:
-            types[self._offset_key] = type_pb2.Type(code=type_pb2.INT64)
+            types[self._offset_key] = SpannerType(code=TypeCode.INT64)
         return types
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -394,7 +394,7 @@ class OrCondition(Condition):
     def segment(self) -> Segment:
         return Segment.WHERE
 
-    def _types(self) -> type_pb2.Type:
+    def _types(self) -> SpannerType:
         result = {}
         for condition in self.all_conditions:
             condition.suffix = str(int(self.suffix or 0) + len(result))
@@ -416,7 +416,7 @@ class OrderByCondition(Condition):
 
     def __init__(self, *orderings: Tuple[Union[field.Field, str], OrderType]):
         super().__init__()
-        for (_, order_type) in orderings:
+        for _, order_type in orderings:
             if not isinstance(order_type, OrderType):
                 raise error.SpannerError(
                     "{order} is not of type OrderType".format(order=order_type)
@@ -428,7 +428,7 @@ class OrderByCondition(Condition):
 
     def _sql(self) -> str:
         orders = []
-        for (column, order_type) in self.orderings:
+        for column, order_type in self.orderings:
             if isinstance(column, field.Field):
                 column = column.name
             orders.append(
@@ -443,11 +443,11 @@ class OrderByCondition(Condition):
     def segment(self) -> Segment:
         return Segment.ORDER_BY
 
-    def _types(self) -> type_pb2.Type:
+    def _types(self) -> SpannerType:
         return {}
 
     def _validate(self, model_class: Type[Any]) -> None:
-        for (column, _) in self.orderings:
+        for column, _ in self.orderings:
             if isinstance(column, field.Field):
                 column = column.name
             if column not in model_class.fields:
@@ -492,7 +492,7 @@ class ComparisonCondition(Condition):
             column_key=self._column_key,
         )
 
-    def _types(self) -> type_pb2.Type:
+    def _types(self) -> SpannerType:
         return {self._column_key: self.model_class.fields[self.column].grpc_type()}
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -522,9 +522,9 @@ class ListComparisonCondition(ComparisonCondition):
             column_key=self._column_key,
         )
 
-    def _types(self) -> type_pb2.Type:
+    def _types(self) -> SpannerType:
         grpc_type = self.model_class.fields[self.column].grpc_type()
-        list_type = type_pb2.Type(code=type_pb2.ARRAY, array_element_type=grpc_type)
+        list_type = SpannerType(code=TypeCode.ARRAY, array_element_type=grpc_type)
         return {self._column_key: list_type}
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -572,7 +572,7 @@ class NullableComparisonCondition(ComparisonCondition):
             )
         return super()._sql()
 
-    def _types(self) -> type_pb2.Type:
+    def _types(self) -> SpannerType:
         if self.is_null():
             return {}
         return super()._types()
@@ -622,7 +622,7 @@ class SelectColumnsCondition(Condition):
     def _sql(self) -> str:
         pass
 
-    def _types(self) -> Dict[str, type_pb2.Type]:
+    def _types(self) -> Dict[str, SpannerType]:
         return {}
 
     def _validate(self, model_class: Type[Any]) -> None:
@@ -650,7 +650,7 @@ class RawFieldCondition(Condition):
     def _sql(self) -> str:
         return f"{self.expr} AS {self.field}"
 
-    def _types(self) -> Dict[str, type_pb2.Type]:
+    def _types(self) -> Dict[str, SpannerType]:
         return {}
 
     def _validate(self, model_class: Type[Any]) -> None:
