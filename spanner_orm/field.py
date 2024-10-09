@@ -16,6 +16,7 @@
 
 import abc
 import datetime
+import json
 from typing import Any, Type, Optional
 
 from spanner_orm import error
@@ -344,6 +345,28 @@ class Timestamp(FieldType):
             raise error.ValidationError("{} is not of type datetime".format(value))
 
 
+class Json(FieldType):
+    """Represents a JSON type."""
+
+    @staticmethod
+    def ddl() -> str:
+        return "JSON"
+
+    @staticmethod
+    def grpc_type() -> SpannerType:
+        return SpannerType(code=TypeCode.JSON)
+
+    @staticmethod
+    def validate_type(value: Any) -> None:
+        if not isinstance(value, str):
+            raise error.ValidationError("{} is not of type str".format(value))
+
+        try:
+            json.loads(value)
+        except:
+            raise error.ValidationError("{} is not a valid JSON".format(value))
+
+
 ALL_TYPES = [
     Boolean,
     Integer,
@@ -357,4 +380,5 @@ ALL_TYPES = [
     IntegerArray,
     FloatArray,
     DateArray,
+    Json,
 ]
