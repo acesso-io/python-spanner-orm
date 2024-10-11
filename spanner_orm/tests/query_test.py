@@ -18,13 +18,11 @@ import unittest
 from unittest import mock
 
 from absl.testing import parameterized
-from spanner_orm import condition
-from spanner_orm import error
-from spanner_orm import field
-from spanner_orm import query
-from spanner_orm.tests import models
+from google.cloud.spanner_v1 import Type as SpannerType
+from google.cloud.spanner_v1 import TypeCode
 
-from google.cloud.spanner_v1.proto import type_pb2
+from spanner_orm import condition, error, field, query
+from spanner_orm.tests import models
 
 
 def now():
@@ -211,7 +209,7 @@ class QueryTest(parameterized.TestCase):
             expected_sql = " WHERE table.{} {} UNNEST(@{})".format(
                 column, current_condition.operator, column_key
             )
-            list_type = type_pb2.Type(code=type_pb2.ARRAY, array_element_type=grpc_type)
+            list_type = SpannerType(code=TypeCode.ARRAY, array_element_type=grpc_type)
             self.assertEndsWith(select_query.sql(), expected_sql)
             self.assertEqual(select_query.parameters(), {column_key: values})
             self.assertEqual(select_query.types(), {column_key: list_type})

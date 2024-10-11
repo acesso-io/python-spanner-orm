@@ -14,10 +14,7 @@
 # limitations under the License.
 """Models used by unit tests."""
 
-from spanner_orm import field
-from spanner_orm import index
-from spanner_orm import model
-from spanner_orm import relationship
+from spanner_orm import field, index, model, relationship
 
 
 class SmallTestModel(model.Model):
@@ -114,6 +111,7 @@ class UnittestModel(model.Model):
     date = field.Field(field.Date, nullable=True)
     bytes_ = field.Field(field.Bytes, nullable=True)
     bytes_2 = field.Field(field.Bytes, nullable=True, size=2048)
+    json = field.Field(field.Json, nullable=True)
     bool_array = field.Field(field.BoolArray, nullable=True)
     int_array = field.Field(field.IntegerArray, nullable=True)
     float_array = field.Field(field.FloatArray, nullable=True)

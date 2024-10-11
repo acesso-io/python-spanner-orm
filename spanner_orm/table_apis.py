@@ -18,8 +18,12 @@ import logging
 from typing import Any, Dict, Iterable, List
 
 from google.cloud import spanner
-from google.cloud.spanner_v1 import transaction as spanner_transaction
-from google.cloud.spanner_v1.proto import type_pb2
+from google.cloud.spanner_v1 import (
+    Type as SpannerType,
+)
+from google.cloud.spanner_v1 import (
+    transaction as spanner_transaction,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -55,8 +59,8 @@ def sql_query(
     transaction: spanner_transaction.Transaction,
     query: str,
     parameters: Dict[str, Any],
-    parameter_types: Dict[str, type_pb2.Type],
-    **kwargs
+    parameter_types: Dict[str, SpannerType],
+    **kwargs,
 ) -> List[Iterable[Any]]:
     """Executes a given SQL query against the Spanner database.
 

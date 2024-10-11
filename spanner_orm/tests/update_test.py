@@ -16,8 +16,7 @@ import logging
 import unittest
 from unittest import mock
 
-from spanner_orm import error, relationship
-from spanner_orm import field
+from spanner_orm import error, field, relationship
 from spanner_orm.admin import update
 from spanner_orm.index import Index
 from spanner_orm.tests import models
@@ -112,6 +111,7 @@ class UpdateTest(unittest.TestCase):
             " date DATE,"
             " bytes_ BYTES(MAX),"
             " bytes_2 BYTES(2048),"
+            " json JSON,"
             " bool_array ARRAY<BOOL>,"
             " int_array ARRAY<INT64>,"
             " float_array ARRAY<FLOAT64>,"
@@ -146,6 +146,7 @@ class UpdateTest(unittest.TestCase):
                     name="timestamp_2",
                 ),
                 "date": field.Field(field.Date, nullable=True, name="date"),
+                "json": field.Field(field.Json, nullable=True, name="json"),
                 "bool_array": field.Field(
                     field.BoolArray, nullable=True, name="bool_array"
                 ),
@@ -176,6 +177,7 @@ class UpdateTest(unittest.TestCase):
             " timestamp TIMESTAMP NOT NULL,"
             " timestamp_2 TIMESTAMP OPTIONS (allow_commit_timestamp=true),"
             " date DATE,"
+            " json JSON,"
             " bool_array ARRAY<BOOL>,"
             " int_array ARRAY<INT64>,"
             " float_array ARRAY<FLOAT64>,"
